@@ -341,44 +341,6 @@
             }
         }
 
-        /* 模板设置区 */
-        .template-settings {
-            margin-top: 24px;
-            padding-top: 20px;
-            border-top: 1px dashed var(--border);
-        }
-        
-        .template-settings summary {
-            font-size: 13px;
-            color: var(--text-muted);
-            cursor: pointer;
-            user-select: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-weight: 500;
-            transition: var(--transition);
-        }
-
-        .template-settings summary:hover {
-            color: var(--primary);
-        }
-
-        .template-settings summary::-webkit-details-marker {
-            display: none;
-        }
-
-        .template-editor {
-            margin-top: 16px;
-            animation: fadeInDown 0.3s ease-out;
-        }
-        
-        .template-editor textarea {
-            height: 200px;
-            margin-bottom: 12px;
-            background-color: #fafafb;
-        }
-
         .error-shake {
             animation: shake 0.3s ease-in-out;
             border-color: #ef4444 !important;
@@ -396,19 +358,14 @@
         </div>
 
         <div class="input-section">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
-                <div class="input-helper" style="margin-bottom: 0;">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <line x1="12" y1="16" x2="12" y2="12"></line>
-                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                    </svg>
-                    フォーマット：注文番号 追跡番号 発送日 お届け日（スペースまたはTab区切り）
-                </div>
-                <div style="font-size: 13px; color: var(--text-muted); font-weight: 500; white-space: nowrap; margin-left: 12px;">
-                    入力件数: <span id="inputCount" style="color: var(--primary); font-weight: 600; font-family: 'JetBrains Mono', monospace; font-size: 14px;">0</span> 件
-                </div>
+            <div class="input-helper">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                フォーマット：注文番号 追跡番号 発送日 お届け日（スペースまたはTab区切り）
             </div>
             <textarea id="bulkInput" placeholder="データを入力してください。例：
 503-2249623-6504668 764068771900 2026年2月20日(金) 2026年2月21日(土)
@@ -432,29 +389,6 @@
                     一括で配送状況を確認
                 </button>
             </div>
-
-            <details class="template-settings">
-                <summary>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-                    カスタムテンプレート
-                </summary>
-                <div class="template-editor">
-                    <div class="input-helper" style="font-size: 12px; margin-bottom: 8px;">
-                        利用可能な変数：{orderId}, {trackNum}, {sendDate}, {deliverDate}
-                    </div>
-                    <textarea id="templateInput" spellcheck="false"></textarea>
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <button class="copy-btn" onclick="saveTemplate(this)">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
-                            <span>テンプレートを保存</span>
-                        </button>
-                        <button class="copy-btn" onclick="resetTemplate(this)" style="color: #ef4444; border-color: #fca5a5; background: transparent;">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                            <span>デフォルトに戻す</span>
-                        </button>
-                    </div>
-                </div>
-            </details>
         </div>
 
         <div id="outputArea"></div>
@@ -464,103 +398,6 @@
         // Icons
         const copyIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
         const checkIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
-
-        const DEFAULT_TEMPLATE = `-- ご注文が発送されたことの確認。
-ヤマト運輸で発送いたしました。
-
--- ご注文が発送された日付。
-{sendDate}
-
--- 使用した配送業者の名前。
-ヤマト運輸
-
--- 配送業者の URL。
-https://toi.kuronekoyamato.co.jp/cgi-bin/tneko
-
--- 配達確認または追跡番号、および署名された配達の証明 (該当する場合)。
-{trackNum}
-
--- 返品および返金ポリシー、キャンセルポリシー。
-こちらの注文に関しましては、返品・返金・キャンセルが行われていないことを確認いたしました。
-
--- 返金と引き換えに商品を返品するために購入者が使用する返品先住所。
-〒101-0024　東京都千代田区神田和泉町1-1-7 合同会社カラフルスター
-
-事情をご説明させていただきます。
-調査の結果、弊社は{sendDate}にヤマト運輸で発送し、{deliverDate}に配達完了が完了していることを確認いたしました。`;
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const savedTemplate = localStorage.getItem('chargeback_template');
-            document.getElementById('templateInput').value = savedTemplate || DEFAULT_TEMPLATE;
-            
-            const bulkInput = document.getElementById('bulkInput');
-            if (bulkInput) {
-                bulkInput.addEventListener('input', updateInputCount);
-                updateInputCount();
-            }
-        });
-
-        function updateInputCount() {
-            const input = document.getElementById('bulkInput').value;
-            let count = 0;
-            if (input.trim()) {
-                const lines = input.split('\n');
-                lines.forEach((line) => {
-                    if (line.trim().length > 0) {
-                        count++;
-                    }
-                });
-            }
-            document.getElementById('inputCount').innerText = count;
-        }
-
-        function saveTemplate(btn) {
-            const val = document.getElementById('templateInput').value.trim();
-            if (!val) {
-                alert("テンプレートを空にすることはできません！");
-                return;
-            }
-            localStorage.setItem('chargeback_template', val);
-            
-            const span = btn.querySelector('span');
-            const originalText = span.innerText;
-            const originalHtml = btn.innerHTML;
-
-            span.innerText = "保存しました";
-            btn.innerHTML = checkIcon + btn.innerHTML.substring(btn.innerHTML.indexOf('<span'));
-            btn.classList.add("copied");
-
-            setTimeout(() => {
-                span.innerText = originalText;
-                btn.innerHTML = originalHtml;
-                btn.classList.remove("copied");
-            }, 2000);
-        }
-
-        function resetTemplate(btn) {
-            if (confirm("デフォルトのテンプレートに戻しますか？現在のカスタマイズ内容は上書きされます。")) {
-                document.getElementById('templateInput').value = DEFAULT_TEMPLATE;
-                localStorage.removeItem('chargeback_template');
-                
-                const span = btn.querySelector('span');
-                const originalText = span.innerText;
-                const originalHtml = btn.innerHTML;
-
-                span.innerText = "復元しました";
-                btn.style.color = "";
-                btn.style.borderColor = "";
-                btn.innerHTML = checkIcon + btn.innerHTML.substring(btn.innerHTML.indexOf('<span'));
-                btn.classList.add("copied");
-
-                setTimeout(() => {
-                    span.innerText = originalText;
-                    btn.innerHTML = originalHtml;
-                    btn.classList.remove("copied");
-                    btn.style.color = "#ef4444";
-                    btn.style.borderColor = "#fca5a5";
-                }, 2000);
-            }
-        }
 
         function processData() {
             const input = document.getElementById('bulkInput').value.trim();
@@ -578,7 +415,6 @@ https://toi.kuronekoyamato.co.jp/cgi-bin/tneko
 
             const lines = input.split('\n');
             let delayCount = 0;
-            let sequenceNum = 1;
 
             lines.forEach((line) => {
                 if (!line.trim()) return;
@@ -591,9 +427,8 @@ https://toi.kuronekoyamato.co.jp/cgi-bin/tneko
                     const deliverDate = formatJapaneseDate(parts[3]);
 
                     // 错开动画时间实现级联效果
-                    createResultCard(sequenceNum, orderId, trackNum, sendDate, deliverDate, delayCount * 0.08);
+                    createResultCard(orderId, trackNum, sendDate, deliverDate, delayCount * 0.08);
                     delayCount++;
-                    sequenceNum++;
                 } else {
                     console.warn("データ形式が不完全です。この行をスキップしました：", line);
                 }
@@ -625,20 +460,35 @@ https://toi.kuronekoyamato.co.jp/cgi-bin/tneko
             return dateStr;
         }
 
-        function createResultCard(seqIndex, orderId, trackNum, sendDate, deliverDate, animDelay) {
-            let rawTemplate = localStorage.getItem('chargeback_template') || DEFAULT_TEMPLATE;
-            
-            const template = rawTemplate
-                .replace(/{orderId}/g, orderId)
-                .replace(/{trackNum}/g, trackNum)
-                .replace(/{sendDate}/g, sendDate)
-                .replace(/{deliverDate}/g, deliverDate);
+        function createResultCard(orderId, trackNum, sendDate, deliverDate, animDelay) {
+            const template = `-- ご注文が発送されたことの確認。
+ヤマト運輸で発送いたしました。
+
+-- ご注文が発送された日付。
+${sendDate}
+
+-- 使用した配送業者の名前。
+ヤマト運輸
+
+-- 配送業者の URL。
+https://toi.kuronekoyamato.co.jp/cgi-bin/tneko
+
+-- 配達確認または追跡番号、および署名された配達の証明 (該当する場合)。
+${trackNum}
+
+-- 返品および返金ポリシー、キャンセルポリシー。
+こちらの注文に関しましては、返品・返金・キャンセルが行われていないことを確認いたしました。
+
+-- 返金と引き換えに商品を返品するために購入者が使用する返品先住所。
+〒101-0024　東京都千代田区神田和泉町1-1-7 合同会社カラフルスター
+
+事情をご説明させていただきます。
+調査の結果、弊社は${sendDate}にヤマト運輸で発送し、${deliverDate}に配達完了が完了していることを確認いたしました。`;
 
             const cardHTML = `
             <div class="result-card" style="animation-delay: ${animDelay}s">
                 <div class="card-header">
                     <div class="order-id-group">
-                        <span style="background-color: #f4f4f5; color: var(--text-muted); border: 1px solid #e4e4e7; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 11px; font-weight: 600; font-family: 'Inter', sans-serif;">${seqIndex}</span>
                         <span class="order-label">Order ID</span>
                         <span class="order-id">${orderId}</span>
                     </div>
