@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>チャージバック一括返信生成ツール</title>
+    <!-- 引入 Inter 字体 -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #18181b;
+            /* 极简黑 */
+            --primary-hover: #27272a;
+            --bg-color: #fafafb;
+            /* 柔和背景 */
+            --card-bg: #ffffff;
+            --border: #e4e4e7;
+            --text-main: #27272a;
+            --text-muted: #71717a;
+            --success: #10b981;
+            --success-bg: #d1fae5;
+            --radius-lg: 16px;
+            --radius-md: 10px;
+            --radius-sm: 6px;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 720px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 36px;
+            animation: fadeInDown 0.6s ease-out;
+        }
+
+        .header h1 {
+            font-size: 26px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            margin: 0 0 10px 0;
+            color: var(--primary);
+        }
+
+        .header p {
+            font-size: 15px;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        /* 输入区域样式 */
+        .input-section {
+            background-color: var(--card-bg);
+            padding: 28px;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 32px;
+            transition: var(--transition);
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        .input-section:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .input-helper {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
+        }
+
+        .input-helper svg {
+            width: 15px;
+            height: 15px;
+            color: #a1a1aa;
+        }
+
+        textarea {
+            width: 100%;
+            height: 140px;
+            padding: 18px;
+            font-family: 'JetBrains Mono', 'Menlo', 'Courier New', monospace;
+            font-size: 13px;
+            color: var(--text-main);
+            background-color: #fcfcfd;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            box-sizing: border-box;
+            resize: vertical;
+            margin-bottom: 24px;
+            line-height: 1.6;
+            transition: var(--transition);
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #a1a1aa;
+            background-color: #ffffff;
+            box-shadow: 0 0 0 4px rgba(24, 24, 27, 0.05);
+        }
+
+        textarea::placeholder {
+            color: #a1a1aa;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 13px 28px;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            width: 100%;
+            transition: var(--transition);
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* 结果展示区 */
+        #outputArea {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .result-card {
+            background-color: var(--card-bg);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            animation: slideUpFade 0.4s ease-out forwards;
+            opacity: 0;
+            transform: translateY(15px);
+            transition: var(--transition);
+        }
+
+        .result-card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            background-color: rgba(250, 250, 251, 0.5);
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .order-id-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .order-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .order-id {
+            font-size: 15px;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--primary);
+            background: #f4f4f5;
+            padding: 4px 10px;
+            border-radius: 6px;
+        }
+
+        .card-body {
+            padding: 24px;
+        }
+
+        .template-text {
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            line-height: 1.7;
+            background-color: #fcfcfd;
+            padding: 20px;
+            border: 1px solid #f4f4f5;
+            border-radius: var(--radius-md);
+            white-space: pre-wrap;
+            color: #3f3f46;
+            margin-bottom: 24px;
+        }
+
+        /* 复制按钮通用样式 */
+        .copy-btn {
+            background-color: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            padding: 8px 14px;
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .copy-btn svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .copy-btn:hover {
+            color: var(--primary);
+            border-color: #d4d4d8;
+            background-color: #fafafb;
+        }
+
+        .copy-btn.copied {
+            background-color: var(--success-bg);
+            color: var(--success);
+            border-color: #a7f3d0;
+        }
+
+        .copy-btn.copied svg {
+            color: var(--success);
+        }
+
+        .copy-full-btn {
+            background-color: #ffffff;
+            color: var(--primary);
+            border: 1px solid var(--border);
+            width: 100%;
+            padding: 13px;
+            font-size: 14px;
+            font-weight: 500;
+            justify-content: center;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .copy-full-btn:hover {
+            border-color: #d4d4d8;
+            background-color: #fafafb;
+        }
+
+        .copy-full-btn:active {
+            box-shadow: none;
+            transform: translateY(1px);
+        }
+
+        /* 动画关键帧 */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-15px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideUpFade {
+            to {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 震动动画用于错误提示 */
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-4px);
+            }
+
+            75% {
+                transform: translateX(4px);
+            }
+        }
+
+        /* 模板设置区 */
+        .template-settings {
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px dashed var(--border);
+        }
+        
+        .template-settings summary {
+            font-size: 13px;
+            color: var(--text-muted);
+            cursor: pointer;
+            user-select: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .template-settings summary:hover {
+            color: var(--primary);
+        }
+
+        .template-settings summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .template-editor {
+            margin-top: 16px;
+            animation: fadeInDown 0.3s ease-out;
+        }
+        
+        .template-editor textarea {
+            height: 200px;
+            margin-bottom: 12px;
+            background-color: #fafafb;
+        }
+
+        .error-shake {
+            animation: shake 0.3s ease-in-out;
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1) !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>チャージバック 一括生成</h1>
+            <p>標準フォーマットの申し立て返信を一括生成、シンプルで高効率</p>
+        </div>
+
+        <div class="input-section">
+            <div class="input-helper">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                フォーマット：注文番号 追跡番号 発送日 お届け日（スペースまたはTab区切り）
+            </div>
+            <textarea id="bulkInput" placeholder="データを入力してください。例：
+503-2249623-6504668 764068771900 2026年2月20日(金) 2026年2月21日(土)
+503-6690613-2060653 764068771620 2026年2月20日(金) 2026年2月21日(土)"></textarea>
+            <div style="display: flex; gap: 12px;">
+                <button class="btn" onclick="processData()" style="flex: 1;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2v20"></path>
+                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                    </svg>
+                    ワンクリックで返信を生成
+                </button>
+                <button class="btn" onclick="batchTrackYamato()"
+                    style="flex: 1; background-color: #ffffff; color: var(--primary); border: 1px solid var(--border); box-shadow: var(--shadow-sm);">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    一括で配送状況を確認
+                </button>
+            </div>
+
+            <details class="template-settings">
+                <summary>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                    カスタムテンプレート
+                </summary>
+                <div class="template-editor">
+                    <div class="input-helper" style="font-size: 12px; margin-bottom: 8px;">
+                        利用可能な変数：{orderId}, {trackNum}, {sendDate}, {deliverDate}
+                    </div>
+                    <textarea id="templateInput" spellcheck="false"></textarea>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <button class="copy-btn" onclick="saveTemplate(this)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                            <span>テンプレートを保存</span>
+                        </button>
+                        <button class="copy-btn" onclick="resetTemplate(this)" style="color: #ef4444; border-color: #fca5a5; background: transparent;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                            <span>デフォルトに戻す</span>
+                        </button>
+                    </div>
+                </div>
+            </details>
+        </div>
+
+        <div id="outputArea"></div>
+    </div>
+
+    <script>
+        // Icons
+        const copyIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
+        const checkIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+
+        const DEFAULT_TEMPLATE = `-- ご注文が発送されたことの確認。
+ヤマト運輸で発送いたしました。
+
+-- ご注文が発送された日付。
+{sendDate}
+
+-- 使用した配送業者の名前。
+ヤマト運輸
+
+-- 配送業者の URL。
+https://toi.kuronekoyamato.co.jp/cgi-bin/tneko
+
+-- 配達確認または追跡番号、および署名された配達の証明 (該当する場合)。
+{trackNum}
+
+-- 返品および返金ポリシー、キャンセルポリシー。
+こちらの注文に関しましては、返品・返金・キャンセルが行われていないことを確認いたしました。
+
+-- 返金と引き換えに商品を返品するために購入者が使用する返品先住所。
+〒101-0024　東京都千代田区神田和泉町1-1-7 合同会社カラフルスター
+
+事情をご説明させていただきます。
+調査の結果、弊社は{sendDate}にヤマト運輸で発送し、{deliverDate}に配達完了が完了していることを確認いたしました。`;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTemplate = localStorage.getItem('chargeback_template');
+            document.getElementById('templateInput').value = savedTemplate || DEFAULT_TEMPLATE;
+        });
+
+        function saveTemplate(btn) {
+            const val = document.getElementById('templateInput').value.trim();
+            if (!val) {
+                alert("テンプレートを空にすることはできません！");
+                return;
+            }
+            localStorage.setItem('chargeback_template', val);
+            
+            const span = btn.querySelector('span');
+            const originalText = span.innerText;
+            const originalHtml = btn.innerHTML;
+
+            span.innerText = "保存しました";
+            btn.innerHTML = checkIcon + btn.innerHTML.substring(btn.innerHTML.indexOf('<span'));
+            btn.classList.add("copied");
+
+            setTimeout(() => {
+                span.innerText = originalText;
+                btn.innerHTML = originalHtml;
+                btn.classList.remove("copied");
+            }, 2000);
+        }
+
+        function resetTemplate(btn) {
+            if (confirm("デフォルトのテンプレートに戻しますか？現在のカスタマイズ内容は上書きされます。")) {
+                document.getElementById('templateInput').value = DEFAULT_TEMPLATE;
+                localStorage.removeItem('chargeback_template');
+                
+                const span = btn.querySelector('span');
+                const originalText = span.innerText;
+                const originalHtml = btn.innerHTML;
+
+                span.innerText = "復元しました";
+                btn.style.color = "";
+                btn.style.borderColor = "";
+                btn.innerHTML = checkIcon + btn.innerHTML.substring(btn.innerHTML.indexOf('<span'));
+                btn.classList.add("copied");
+
+                setTimeout(() => {
+                    span.innerText = originalText;
+                    btn.innerHTML = originalHtml;
+                    btn.classList.remove("copied");
+                    btn.style.color = "#ef4444";
+                    btn.style.borderColor = "#fca5a5";
+                }, 2000);
+            }
+        }
+
+        function processData() {
+            const input = document.getElementById('bulkInput').value.trim();
+            const outputArea = document.getElementById('outputArea');
+            const textarea = document.getElementById('bulkInput');
+
+            outputArea.innerHTML = '';
+
+            if (!input) {
+                textarea.classList.add('error-shake');
+                setTimeout(() => textarea.classList.remove('error-shake'), 400);
+                textarea.focus();
+                return;
+            }
+
+            const lines = input.split('\n');
+            let delayCount = 0;
+
+            lines.forEach((line) => {
+                if (!line.trim()) return;
+
+                const parts = line.trim().split(/\s+/);
+                if (parts.length >= 4) {
+                    const orderId = parts[0];
+                    const trackNum = parts[1];
+                    const sendDate = formatJapaneseDate(parts[2]);
+                    const deliverDate = formatJapaneseDate(parts[3]);
+
+                    // 错开动画时间实现级联效果
+                    createResultCard(orderId, trackNum, sendDate, deliverDate, delayCount * 0.08);
+                    delayCount++;
+                } else {
+                    console.warn("データ形式が不完全です。この行をスキップしました：", line);
+                }
+            });
+        }
+
+        function formatJapaneseDate(dateStr) {
+            if (!dateStr) return dateStr;
+            if (dateStr.includes('年') && dateStr.includes('(')) return dateStr;
+
+            const match = dateStr.match(/(\d{1,2})[月/](\d{1,2})日?/);
+            if (match) {
+                const m = parseInt(match[1], 10);
+                const d = parseInt(match[2], 10);
+                
+                const now = new Date();
+                let yr = now.getFullYear();
+                
+                // 跨年判断：如果填写的月份比当前系统时间的月份大3个月以上
+                // (例如在 1月 或 2月 处理上一年度的 11月 或 12月 的订单)
+                if (m > now.getMonth() + 4) {
+                    yr -= 1;
+                }
+                
+                const dateObj = new Date(yr, m - 1, d);
+                const weekDays = ['日', '月', '火', '水', '木', '金', '土'];
+                return `${yr}年${m}月${d}日(${weekDays[dateObj.getDay()]})`;
+            }
+            return dateStr;
+        }
+
+        function createResultCard(orderId, trackNum, sendDate, deliverDate, animDelay) {
+            let rawTemplate = localStorage.getItem('chargeback_template') || DEFAULT_TEMPLATE;
+            
+            const template = rawTemplate
+                .replace(/{orderId}/g, orderId)
+                .replace(/{trackNum}/g, trackNum)
+                .replace(/{sendDate}/g, sendDate)
+                .replace(/{deliverDate}/g, deliverDate);
+
+            const cardHTML = `
+            <div class="result-card" style="animation-delay: ${animDelay}s">
+                <div class="card-header">
+                    <div class="order-id-group">
+                        <span class="order-label">Order ID</span>
+                        <span class="order-id">${orderId}</span>
+                    </div>
+                    <button class="copy-btn" onclick="copyText('${orderId}', this, false)">
+                        ${copyIcon} <span>注文番号をコピー</span>
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="template-text">${template}</div>
+                    <button class="copy-btn copy-full-btn" onclick="copyText(decodeURIComponent('${encodeURIComponent(template)}'), this, true)">
+                        ${copyIcon} <span>返信テンプレート全体をコピー</span>
+                    </button>
+                </div>
+            </div>
+            `;
+
+            document.getElementById('outputArea').insertAdjacentHTML('beforeend', cardHTML);
+        }
+
+        function copyText(text, btnElement, isFullCopy) {
+            navigator.clipboard.writeText(text).then(() => {
+                const span = btnElement.querySelector('span');
+                const originalText = span.innerText;
+
+                span.innerText = "コピーしました";
+                btnElement.innerHTML = checkIcon + btnElement.innerHTML.substring(btnElement.innerHTML.indexOf('<span'));
+                btnElement.classList.add("copied");
+
+                setTimeout(() => {
+                    span.innerText = originalText;
+                    btnElement.innerHTML = copyIcon + btnElement.innerHTML.substring(btnElement.innerHTML.indexOf('<span'));
+                    btnElement.classList.remove("copied");
+                }, 2000);
+            }).catch(err => {
+                alert("コピーに失敗しました。ブラウザの権限を確認してください！");
+                console.error(err);
+            });
+        }
+        function batchTrackYamato() {
+            const input = document.getElementById('bulkInput').value.trim();
+            const textarea = document.getElementById('bulkInput');
+
+            if (!input) {
+                textarea.classList.add('error-shake');
+                setTimeout(() => textarea.classList.remove('error-shake'), 400);
+                textarea.focus();
+                return;
+            }
+
+            const lines = input.split('\n');
+            const trackingNumbers = [];
+
+            lines.forEach((line) => {
+                if (!line.trim()) return;
+                const parts = line.trim().split(/\s+/);
+                if (parts.length >= 2) {
+                    const trackNum = parts[1].replace(/\D/g, '');
+                    if (trackNum && !trackingNumbers.includes(trackNum)) {
+                        trackingNumbers.push(trackNum);
+                    }
+                }
+            });
+
+            if (trackingNumbers.length === 0) {
+                alert("有効な追跡番号が見つかりませんでした。");
+                return;
+            }
+
+            const chunks = [];
+            for (let i = 0; i < trackingNumbers.length; i += 10) {
+                chunks.push(trackingNumbers.slice(i, i + 10));
+            }
+
+            chunks.forEach((chunk, chunkIndex) => {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = 'https://toi.kuronekoyamato.co.jp/cgi-bin/tneko';
+                form.target = `_blank_yamato_${Date.now()}_${chunkIndex}`;
+
+                chunk.forEach((num, index) => {
+                    const hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    const numStr = String(index + 1).padStart(2, '0');
+                    hiddenInput.name = `number${numStr}`;
+                    hiddenInput.value = num;
+                    form.appendChild(hiddenInput);
+                });
+
+                document.body.appendChild(form);
+                form.submit();
+                document.body.removeChild(form);
+            });
+
+            if (chunks.length > 1) {
+                const total = trackingNumbers.length;
+                alert(`全部で ${total} 件の追跡番号が見つかりました。\nヤマトのシステム制限（1回10件）により、小分けにして複数のタブで開きました。\n※ブラウザがポップアップをブロックした場合は、アドレスバーの設定から許可してください。`);
+            }
+        }
+    </script>
+
+</body>
+
+</html>
